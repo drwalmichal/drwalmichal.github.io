@@ -1,5 +1,60 @@
+<!DOCTYPE html>
 <html>
-<body>
-    <p>Hello World</p>
+<head>
+    <style> /* set the CSS */
+    
+    body { font: 12px Arial;}
+    
+    path { 
+        stroke: steelblue;
+        stroke-width: 2;
+        fill: none;
+    }
+    .axis path,
+    
+    .axis line {
+        fill: none;
+        stroke: grey;
+        stroke-width: 1;
+        shape-rendering: crispEdges;
+    }
+    </style>
+    <script src='https://d3js.org/d3.v5.min.js'></script>
+</head>
+    <body>
+    <script>
+    
+    // Set the dimensions of the canvas / graph
+    var width = 800;
+    var height = 800;
+    
+    // Set the ranges
+    var x = d3.scaleLinear().domain([0,12]).range([0,width-100]);
+    var y = d3.scaleLinear().domain([10,150]).range([height-100,0]);
+    
+    // Adds the svg canvas
+    var svg = d3.select("body")
+        .append("svg")
+            .attr('width', width)
+            .attr('height', height)
+        .append("g")
+            .attr("transform","translate(50,50)")
+    
+    // Get the data
+    d3.csv('cars.csv', function(data) {
+        
+        
+        // Add the scatterplot
+        svg.selectAll('dot').data(data)
+          .enter()
+          .append('circle')
+            .filter(function(d) {return d.EngineCylinders < 4})
+            .attr('cx', function(d,i) {return x(d.EngineCylinders)})
+            .attr('cy', function(d,i) {return y(d.AverageHighwayMPG);})
+            .attr('r', 7 )
+            .style("fill", "#69b3a2").style('opacity', 0.4).style('stroke',"white")
+    });
+    
+</script>
 </body>
 </html>
