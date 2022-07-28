@@ -1,60 +1,330 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <style> /* set the CSS */
-    
-    body { font: 12px Arial;}
-    
-    path { 
-        stroke: steelblue;
-        stroke-width: 2;
-        fill: none;
-    }
-    .axis path,
-    
-    .axis line {
-        fill: none;
-        stroke: grey;
-        stroke-width: 1;
-        shape-rendering: crispEdges;
-    }
-    </style>
     <script src='https://d3js.org/d3.v5.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <title>Narrative Visualization</title>
 </head>
-    <body>
-    <script>
+<body onload='init()'>
+<p id = 'button-p'>Press through the scenes =></p>
+<button id = 'button1' onclick="scene1()">1</button>
+<button id = 'button2' onclick="scene2()">2</button>
+<button id = 'button3' onclick="scene3()">3</button>
+<div class="tooltip"></div>
+<svg width = 800 height = 800></svg>
+
+<script>
+async function scene1() {
+    const data = await d3.csv(' https://flunky.github.io/cars2017.csv');
+    const svgWidth = 800;
+    const svgHeight = 800;
+
+    const margin = {
+        top:100,
+        left:100,
+        bottom:50,
+        right:50
+    }
+    const width = svgWidth- (margin.left + margin.right);
+    const height = svgHeight- (margin.top + margin.bottom);
+
+    const xDomain= d3.extent(data.map(d=>d.EngineCylinders));
+    const xRange = [0,width];
+    const xScale = d3.scaleLinear()
+        .domain(xDomain)
+        .range(xRange)
     
-    // Set the dimensions of the canvas / graph
-    var width = 800;
-    var height = 800;
-    
-    // Set the ranges
-    var x = d3.scaleLinear().domain([0,12]).range([0,width-100]);
-    var y = d3.scaleLinear().domain([10,150]).range([height-100,0]);
-    
-    // Adds the svg canvas
-    var svg = d3.select("body")
-        .append("svg")
-            .attr('width', width)
-            .attr('height', height)
+    const yDomain= [0,150];
+    const yRange = [height,0];
+    const yScale = d3.scaleLinear()
+        .domain(yDomain)
+        .range(yRange)
+    const div= d3.select('.tooltip');
+
+    d3.select(".circle-g").html("");
+    d3.select("svg")
         .append("g")
-            .attr("transform","translate(50,50)")
+        .attr("class", "circle-g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+    d3.select(".circle-g")
+        .selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .filter(function(d) {return d.EngineCylinders < 4})
+        .attr("cx", d=>xScale(d.EngineCylinders))
+        .attr("cy", d=>yScale(d.AverageHighwayMPG))
+        .attr("r",5)
+        .style("fill", "#69b3a2").style('opacity', 0.4).style('stroke',"white")
+        .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity",0.9);
+            div.html("Make: " + d.Make + "<br/>" +
+                      "Fuel: " + d.Fuel +  "<br/>" +
+                      "Average MPG: " + d.AverageHighwayMPG);
+
+            div.style("left", (d3.event.pageX+10) +"px")
+                .style("top",(d3.event.pageY-30) +"px")
+        })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity",0);
+        })
+
+}
+
+async function scene2() {
+    const data = await d3.csv(' https://flunky.github.io/cars2017.csv');
+    const svgWidth = 800;
+    const svgHeight = 800;
+
+    const margin = {
+        top:100,
+        left:100,
+        bottom:50,
+        right:50
+    }
+    const width = svgWidth- (margin.left + margin.right);
+    const height = svgHeight- (margin.top + margin.bottom);
+
+    const xDomain= d3.extent(data.map(d=>d.EngineCylinders));
+    const xRange = [0,width];
+    const xScale = d3.scaleLinear()
+        .domain(xDomain)
+        .range(xRange)
     
-    // Get the data
-    d3.csv('cars.csv', function(data) {
-        
-        
-        // Add the scatterplot
-        svg.selectAll('dot').data(data)
-          .enter()
-          .append('circle')
-            .filter(function(d) {return d.EngineCylinders < 4})
-            .attr('cx', function(d,i) {return x(d.EngineCylinders)})
-            .attr('cy', function(d,i) {return y(d.AverageHighwayMPG);})
-            .attr('r', 7 )
-            .style("fill", "#69b3a2").style('opacity', 0.4).style('stroke',"white")
-    });
+    const yDomain= [0,150];
+    const yRange = [height,0];
+    const yScale = d3.scaleLinear()
+        .domain(yDomain)
+        .range(yRange)
+
+    const div= d3.select('.tooltip');
+
+    d3.select(".circle-g").html("");
+    d3.select("svg")
+        .append("g")
+        .attr("class", "circle-g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+    d3.select(".circle-g")
+        .selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .filter(function(d) {return d.EngineCylinders < 8})
+        .attr("cx", d=>xScale(d.EngineCylinders))
+        .attr("cy", d=>yScale(d.AverageHighwayMPG))
+        .attr("r",5)
+        .style("fill", "#69b3a2").style('opacity', 0.4).style('stroke',"white")
+        .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity",0.9);
+            div.html("Make: " + d.Make + "<br/>" +
+                      "Fuel: " + d.Fuel +  "<br/>" +
+                      "Average MPG: " + d.AverageHighwayMPG);
+
+            div.style("left", (d3.event.pageX+10) +"px")
+                .style("top",(d3.event.pageY-30) +"px")
+        })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity",0);
+        })
+
+}
+
+async function scene3() {
+    const data = await d3.csv(' https://flunky.github.io/cars2017.csv');
+    const svgWidth = 800;
+    const svgHeight = 800;
+
+    const margin = {
+        top:100,
+        left:100,
+        bottom:50,
+        right:50
+    }
+    const width = svgWidth- (margin.left + margin.right);
+    const height = svgHeight- (margin.top + margin.bottom);
+
+    const xDomain= d3.extent(data.map(d=>d.EngineCylinders));
+    const xRange = [0,width];
+    const xScale = d3.scaleLinear()
+        .domain(xDomain)
+        .range(xRange)
     
+    const yDomain= [0,150];
+    const yRange = [height,0];
+    const yScale = d3.scaleLinear()
+        .domain(yDomain)
+        .range(yRange)
+
+    const div= d3.select('.tooltip');
+
+    d3.select(".circle-g").html("");
+    d3.select("svg")
+        .append("g")
+        .attr("class", "circle-g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+    d3.select(".circle-g")
+        .selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", d=>xScale(d.EngineCylinders))
+        .attr("cy", d=>yScale(d.AverageHighwayMPG))
+        .attr("r",5)
+        .style("fill", "#69b3a2").style('opacity', 0.4).style('stroke',"white")
+        .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity",0.9);
+            div.html("Make: " + d.Make + "<br/>" +
+                      "Fuel: " + d.Fuel +  "<br/>" +
+                      "Average MPG: " + d.AverageHighwayMPG);
+
+            div.style("left", (d3.event.pageX+10) +"px")
+                .style("top",(d3.event.pageY-30) +"px")
+        })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity",0);
+        })
+
+}
+
+async function init() {
+    const data = await d3.csv(' https://flunky.github.io/cars2017.csv');
+    const svgWidth = 800;
+    const svgHeight = 800;
+    console.log(data)
+    const margin = {
+        top:100,
+        left:100,
+        bottom:50,
+        right:50
+    }
+    const width = svgWidth- (margin.left + margin.right);
+    const height = svgHeight- (margin.top + margin.bottom);
+
+    const xDomain= d3.extent(data.map(d=>d.EngineCylinders));
+    const xRange = [0,width];
+    const xScale = d3.scaleLinear()
+        .domain(xDomain)
+        .range(xRange)
+    
+    console.log('XScale: ', xScale.domain(), xScale.range());
+    // const yDomain= d3.extent(data.map(d=>d.AverageHighwayMPG));
+    const yDomain= [0,150];
+    const yRange = [height,0];
+    const yScale = d3.scaleLinear()
+        .domain(yDomain)
+        .range(yRange)
+    
+    console.log('YScale: ', yScale.domain(), yScale.range())
+
+    const xAxis = d3.axisBottom(xScale);
+    const yAxis = d3.axisLeft(yScale);
+    d3.select("svg")
+        .attr("transform", `translate(100,100)`);
+    d3.select("svg")
+        .append("g")
+        .attr("class", "xAxis")
+        .attr("transform", `translate(${margin.left},${svgHeight - margin.bottom})`);
+    
+    d3.select('.xAxis')
+        .append('g')
+        .call(xAxis.ticks(8));
+    
+    d3.select("svg")
+        .append("g")
+        .attr("class", "yAxis")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+    
+    d3.select('.yAxis')
+        .append('g')
+        .call(yAxis.tickValues([0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,135,140,145,150]));
+    
+    d3.select(".xAxis")
+        .append("text")
+        .text("Number of Engine Cylinders")
+        .attr("x", width/3)
+        .attr("y", margin.bottom * 0.7)
+        .style("font-size","18px")
+        .style("font-weight", "bold");
+    
+    d3.select(".yAxis")
+        .append("text")
+        .text("Average Highway Miles Per Gallon")
+        .style("transform","rotate(270deg)")
+        .attr("x",height/1.5 * -1)
+        .attr("y",margin.left * 0.6 * -1)
+        .style("font-size","18px")
+        .style("font-weight","bold");
+    
+    d3.select("svg")
+        .append("g")
+        .attr("class", "circle-g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+ 
+    const div= d3.select('.tooltip');
+    
+    d3.select(".circle-g")
+        .selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .filter(function(d) {return d.EngineCylinders < 4})
+        .attr("cx", d=>xScale(d.EngineCylinders))
+        .attr("cy", d=>yScale(d.AverageHighwayMPG))
+        .attr("r",5)
+        .style("fill", "#69b3a2").style('opacity', 0.4).style('stroke',"white")
+        .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity",0.9);
+            div.html("Make: " + d.Make + "<br/>" +
+                      "Fuel: " + d.Fuel +  "<br/>" +
+                      "Average MPG: " + d.AverageHighwayMPG);
+
+            div.style("left", (d3.event.pageX+10) +"px")
+                .style("top",(d3.event.pageY-30) +"px")
+        })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity",0);
+        })
+    const type = d3.annotationLabel
+    const annotations = [{
+        note: {
+            label: "This ths",
+            wrap: 150,
+            align: "left"
+        },
+        dy: 137,
+        dx: 162,
+        connector: { end: "arrow" },
+        color: "#E8336D"
+    }]
+    const makeAnnotations = d3.annotation()
+        .notePadding(15)
+        .type(type)
+        .annotations(annotations)
+    
+    d3.select('svg')
+        .append('g')
+        .attr('class', 'annotation-g')
+        .attr("transform", `translate(${margin.left},${margin.top + 122})`)
+        .call(makeAnnotations);
+}
+
 </script>
 </body>
 </html>
